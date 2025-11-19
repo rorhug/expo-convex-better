@@ -2,6 +2,7 @@ import { expo } from "@better-auth/expo";
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth";
+import { organization, twoFactor } from "better-auth/plugins";
 import { v } from "convex/values";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
@@ -9,8 +10,19 @@ import { query } from "./_generated/server";
 
 const siteUrl = process.env.SITE_URL || "http://localhost:3000";
 const nativeAppUrl = process.env.NATIVE_APP_URL || "mybettertapp://";
+const expoWebUrl = process.env.EXPO_WEB_URL || "http://localhost:8081";
 
-export const authComponent = createClient<DataModel>(components.betterAuth);
+import authSchema from "./betterAuth/schema";
+
+// @ts-expect-error
+export const authComponent = createClient<DataModel, typeof authSchema>(
+  components.betterAuth,
+  {
+    local: {
+      schema: authSchema,
+    },
+  }
+);
 
 function createAuth(
   ctx: GenericCtx<DataModel>,
@@ -21,13 +33,19 @@ function createAuth(
       disabled: optionsOnly,
     },
     baseURL: siteUrl,
-    trustedOrigins: [siteUrl, nativeAppUrl],
+    trustedOrigins: [siteUrl, nativeAppUrl, expoWebUrl],
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
     },
-    plugins: [expo(), convex()],
+    socialProviders: {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID || "",
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      },
+    },
+    plugins: [expo(), convex(), organization(), twoFactor()],
   });
 }
 

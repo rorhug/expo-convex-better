@@ -61,7 +61,7 @@ export default function TodosScreen() {
         <View className="mb-6">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-bold text-3xl text-foreground">
-              Todo List
+              Todo List ok
             </Text>
             {totalCount > 0 && (
               <Chip color="accent" size="sm" variant="secondary">
