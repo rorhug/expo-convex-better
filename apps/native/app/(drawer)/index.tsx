@@ -7,13 +7,16 @@ import { Container } from "@/components/container";
 export default function Home() {
   const healthCheck = useQuery(api.healthCheck.get);
   const { isAuthenticated } = useConvexAuth();
-  const user = useQuery(api.auth.getCurrentUser, isAuthenticated ? {} : "skip");
-  const mutedColor = useThemeColor("muted");
-  const successColor = useThemeColor("success");
-  const dangerColor = useThemeColor("danger");
+  const _user = useQuery(
+    api.auth.getCurrentUser,
+    isAuthenticated ? {} : "skip"
+  );
+  const _mutedColor = useThemeColor("muted");
+  const _successColor = useThemeColor("success");
+  const _dangerColor = useThemeColor("danger");
 
-  const isConnected = healthCheck === "OK";
-  const isLoading = healthCheck === undefined;
+  const _isConnected = healthCheck === "OK";
+  const _isLoading = healthCheck === undefined;
 
   return (
     <Container className="p-6">

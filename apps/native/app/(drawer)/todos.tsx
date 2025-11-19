@@ -29,7 +29,9 @@ export default function TodosScreen() {
 
   const handleAddTodo = async () => {
     const text = newTodoText.trim();
-    if (!text) return;
+    if (!text) {
+      return;
+    }
     await createTodoMutation({ text });
     setNewTodoText("");
   };

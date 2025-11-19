@@ -27,7 +27,9 @@ export default function TodosPage() {
   const handleAddTodo = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = newTodoText.trim();
-    if (!text) return;
+    if (!text) {
+      return;
+    }
     await createTodoMutation({ text });
     setNewTodoText("");
   };
