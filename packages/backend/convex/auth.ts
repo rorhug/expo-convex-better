@@ -1,6 +1,6 @@
 import { expo } from "@better-auth/expo";
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
+import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth";
 import { organization, twoFactor } from "better-auth/plugins";
 import { v } from "convex/values";
@@ -45,7 +45,13 @@ function createAuth(
     //     clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     //   },
     // },
-    plugins: [expo(), convex(), organization(), twoFactor()],
+    plugins: [
+      expo(),
+      convex(),
+      organization(),
+      twoFactor(),
+      crossDomain({ siteUrl: expoWebUrl }),
+    ],
   });
 }
 
