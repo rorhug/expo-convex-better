@@ -10,7 +10,7 @@ import { AppThemeProvider } from "@/contexts/app-theme-context";
 import { authClient } from "@/lib/auth-client";
 
 export const unstable_settings = {
-  initialRouteName: "(drawer)",
+  initialRouteName: "index",
 };
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL || "";
@@ -21,7 +21,10 @@ const convex = new ConvexReactClient(convexUrl, {
 function StackLayout() {
   return (
     <Stack screenOptions={{}}>
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="no-org" options={{ headerShown: false }} />
+      <Stack.Screen name="[orgId]" options={{ headerShown: false }} />
       <Stack.Screen
         name="modal"
         options={{ title: "Modal", presentation: "modal" }}

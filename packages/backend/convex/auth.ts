@@ -14,7 +14,6 @@ const expoWebUrl = process.env.EXPO_WEB_URL || "http://localhost:8081";
 
 import authSchema from "./betterAuth/schema";
 
-// @ts-expect-error
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
   {
