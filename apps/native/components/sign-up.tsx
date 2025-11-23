@@ -1,25 +1,31 @@
-import { Card, useThemeColor } from "heroui-native";
-import { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Button, TextField } from "heroui-native";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { authClient } from "@/lib/auth-client";
 
-export function SignUp() {
+type SignUpProps = {
+  initialEmail?: string;
+  emailDisabled?: boolean;
+  onSuccess?: () => void;
+};
+
+export function SignUp({
+  initialEmail = "",
+  emailDisabled = false,
+  onSuccess,
+}: SignUpProps = {}) {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const mutedColor = useThemeColor("muted");
-  const _accentColor = useThemeColor("accent");
-  const foregroundColor = useThemeColor("foreground");
-  const _dangerColor = useThemeColor("danger");
+  // Update email when initialEmail changes
+  useEffect(() => {
+    if (initialEmail) {
+      setEmail(initialEmail);
+    }
+  }, [initialEmail]);
 
   const handleSignUp = async () => {
     setIsLoading(true);
@@ -32,14 +38,14 @@ export function SignUp() {
         password,
       },
       {
-        onError: (error) => {
-          setError(error.error?.message || "Failed to sign up");
+        onError: (_error) => {
+          setError(_error.error?.message || "Failed to sign up");
           setIsLoading(false);
         },
         onSuccess: () => {
           setName("");
-          setEmail("");
           setPassword("");
+          onSuccess?.();
         },
         onFinished: () => {
           setIsLoading(false);
@@ -49,53 +55,68 @@ export function SignUp() {
   };
 
   return (
-    <Card className="mt-6 p-4" variant="secondary">
-      <Card.Title className="mb-4">Create Account</Card.Title>
-
-      {error && (
-        <View className="mb-4 rounded-lg bg-danger/10 p-3">
-          <Text className="text-danger text-sm">{error}</Text>
-        </View>
-      )}
-
-      <TextInput
-        className="mb-3 rounded-lg border border-divider bg-surface px-4 py-3 text-foreground"
-        onChangeText={setName}
-        placeholder="Name"
-        placeholderTextColor={mutedColor}
-        value={name}
-      />
-
-      <TextInput
-        autoCapitalize="none"
-        className="mb-3 rounded-lg border border-divider bg-surface px-4 py-3 text-foreground"
-        keyboardType="email-address"
-        onChangeText={setEmail}
-        placeholder="Email"
-        placeholderTextColor={mutedColor}
-        value={email}
-      />
-
-      <TextInput
-        className="mb-4 rounded-lg border border-divider bg-surface px-4 py-3 text-foreground"
-        onChangeText={setPassword}
-        placeholder="Password"
-        placeholderTextColor={mutedColor}
-        secureTextEntry
-        value={password}
-      />
-
-      <Pressable
-        className="flex-row items-center justify-center rounded-lg bg-accent p-4 active:opacity-70"
-        disabled={isLoading}
-        onPress={handleSignUp}
-      >
-        {isLoading ? (
-          <ActivityIndicator color={foregroundColor} size="small" />
-        ) : (
-          <Text className="font-medium text-foreground">Sign Up</Text>
+    <View className="gap-4">
+      <TextField isInvalid={!!error && !name.trim()} isRequired>
+        <TextField.Label>Name</TextField.Label>
+        <TextField.Input
+          onChangeText={(text) => {
+            setName(text);
+            if (error) {
+              setError(null);
+            }
+          }}
+          placeholder="Enter your full name"
+          value={name}
+        />
+        {error && !name.trim() && (
+          <TextField.ErrorMessage>{error}</TextField.ErrorMessage>
         )}
-      </Pressable>
-    </Card>
+      </TextField>
+
+      <TextField isDisabled={emailDisabled} isInvalid={!!error} isRequired>
+        <TextField.Label>Email</TextField.Label>
+        <TextField.Input
+          autoCapitalize="none"
+          keyboardType="email-address"
+          onChangeText={(text) => {
+            setEmail(text);
+            if (error) {
+              setError(null);
+            }
+          }}
+          placeholder="Enter your email"
+          value={email}
+        />
+        {error && <TextField.ErrorMessage>{error}</TextField.ErrorMessage>}
+      </TextField>
+
+      <TextField isInvalid={!!error && !password.trim()} isRequired>
+        <TextField.Label>Password</TextField.Label>
+        <TextField.Input
+          onChangeText={(text) => {
+            setPassword(text);
+            if (error) {
+              setError(null);
+            }
+          }}
+          placeholder="Enter your password"
+          secureTextEntry
+          value={password}
+        />
+        {error && !password.trim() && (
+          <TextField.ErrorMessage>{error}</TextField.ErrorMessage>
+        )}
+      </TextField>
+
+      <Button
+        className="mt-2"
+        isDisabled={isLoading}
+        onPress={handleSignUp}
+        size="lg"
+        variant="secondary"
+      >
+        <Button.Label>Sign Up</Button.Label>
+      </Button>
+    </View>
   );
 }

@@ -226,3 +226,63 @@ export const listInvitations = query({
     );
   },
 });
+
+export const getInvitation = query({
+  args: {
+    invitationId: v.string(),
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      _id: v.string(),
+      organizationId: v.string(),
+      email: v.string(),
+      role: v.union(v.null(), v.string()),
+      status: v.string(),
+      expiresAt: v.number(),
+      inviterId: v.string(),
+      createdAt: v.number(),
+    })
+  ),
+  handler: async (ctx, args) => {
+    const invitationResult = await ctx.runQuery(
+      components.betterAuth.adapter.findOne,
+      {
+        model: "invitation",
+        where: [
+          {
+            field: "_id",
+            value: args.invitationId,
+            operator: "eq",
+          },
+        ],
+      }
+    );
+
+    if (!invitationResult) {
+      return null;
+    }
+
+    const inv = invitationResult as {
+      _id: string;
+      organizationId: string;
+      email: string;
+      role?: string | null;
+      status: string;
+      expiresAt: number;
+      inviterId: string;
+      createdAt?: number;
+    };
+
+    return {
+      _id: inv._id,
+      organizationId: inv.organizationId,
+      email: inv.email,
+      role: inv.role || null,
+      status: inv.status,
+      expiresAt: inv.expiresAt,
+      inviterId: inv.inviterId,
+      createdAt: inv.createdAt || Date.now(),
+    };
+  },
+});

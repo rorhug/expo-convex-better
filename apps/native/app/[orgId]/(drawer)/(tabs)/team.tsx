@@ -1,12 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
 import { api } from "@pdp/backend/convex/_generated/api";
 import { useQuery } from "convex/react";
+import { setStringAsync } from "expo-clipboard";
 import { useGlobalSearchParams } from "expo-router";
 import { Card, useThemeColor } from "heroui-native";
 import { useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  // Clipboard,
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { Container } from "@/components/container";
 import { InviteMemberDialog } from "@/components/invite-member-dialog";
+import { authClient } from "@/lib/auth-client";
 
 type MemberWithUser = {
   _id: string;
@@ -41,6 +51,9 @@ type Invitation = {
 export default function Team() {
   const { orgId } = useGlobalSearchParams<{ orgId: string }>();
   const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [copiedInvitationId, setCopiedInvitationId] = useState<string | null>(
+    null
+  );
   const members = useQuery(api.organizations.listMembers, {
     organizationId: orgId || "",
   });
@@ -49,9 +62,9 @@ export default function Team() {
   });
 
   const accentForegroundColor = useThemeColor("accent-foreground");
-
-  console.log("members", members);
-  console.log("invitations", invitations);
+  const foregroundColor = useThemeColor("foreground");
+  const dangerColor = useThemeColor("danger");
+  const baseUrl = process.env.EXPO_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const renderItem = ({ item }: { item: MemberWithUser }) => {
     if (!item.user) {
@@ -67,7 +80,7 @@ export default function Team() {
             </Text>
             <Text className="text-muted text-sm">{item.user.email}</Text>
           </View>
-          <View className="rounded bg-muted px-2 py-1">
+          <View className="px-2 py-1">
             <Text className="text-foreground text-lg capitalize">
               {item.role}
             </Text>
@@ -77,8 +90,46 @@ export default function Team() {
     );
   };
 
+  const handleCopyInvitation = async (invitationId: string) => {
+    const url = `${baseUrl}/accept-invitation?invitationId=${invitationId}`;
+    await setStringAsync(url);
+    setCopiedInvitationId(invitationId);
+    setTimeout(() => setCopiedInvitationId(null), 2000);
+  };
+
+  const handleDeleteInvitation = (invitationId: string, email: string) => {
+    Alert.alert(
+      "Cancel Invitation",
+      `Are you sure you want to cancel the invitation for ${email}?`,
+      [
+        { text: "No", style: "cancel" },
+        {
+          text: "Yes",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const result = await authClient.organization.cancelInvitation({
+                invitationId,
+              });
+              if (result.error) {
+                Alert.alert(
+                  "Error",
+                  result.error.message || "Failed to cancel invitation"
+                );
+              }
+            } catch (error) {
+              console.error("Error canceling invitation:", error);
+              Alert.alert("Error", "Failed to cancel invitation");
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const renderInvitationItem = ({ item }: { item: Invitation }) => {
     const isExpired = Date.now() > item.expiresAt;
+    const isCopied = copiedInvitationId === item._id;
 
     return (
       <Card className="mb-2 p-4" variant="secondary">
@@ -96,10 +147,36 @@ export default function Team() {
               )}
             </View>
           </View>
-          <View className="rounded bg-muted px-2 py-1">
-            <Text className="text-foreground text-xs capitalize">
-              {item.status}
-            </Text>
+          <View className="flex-row items-center gap-2">
+            <View className="rounded px-2 py-1">
+              <Text className="text-foreground text-xs capitalize">
+                {item.status}
+              </Text>
+            </View>
+            <Pressable
+              className="rounded-lg bg-accent/10 p-2 active:opacity-70"
+              onPress={() => handleCopyInvitation(item._id)}
+            >
+              {isCopied ? (
+                <Ionicons
+                  color={accentForegroundColor}
+                  name="checkmark"
+                  size={18}
+                />
+              ) : (
+                <Ionicons
+                  color={foregroundColor}
+                  name="copy-outline"
+                  size={18}
+                />
+              )}
+            </Pressable>
+            <Pressable
+              className="rounded-lg bg-danger/10 p-2 active:opacity-70"
+              onPress={() => handleDeleteInvitation(item._id, item.email)}
+            >
+              <Ionicons color={dangerColor} name="trash-outline" size={18} />
+            </Pressable>
           </View>
         </View>
       </Card>

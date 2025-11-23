@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { setStringAsync } from "expo-clipboard";
 import { Card, useThemeColor } from "heroui-native";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Clipboard,
   Modal,
   Pressable,
   Text,
@@ -34,7 +34,7 @@ export function InviteMemberDialog({
   const mutedColor = useThemeColor("muted");
   const successColor = useThemeColor("success");
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.EXPO_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const handleInvite = async () => {
     const trimmedEmail = email.trim();
@@ -87,9 +87,9 @@ export function InviteMemberDialog({
     }
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (invitationUrl) {
-      Clipboard.setString(invitationUrl);
+      await setStringAsync(invitationUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
