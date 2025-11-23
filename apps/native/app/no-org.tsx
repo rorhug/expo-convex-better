@@ -25,7 +25,7 @@ export default function NoOrgScreen() {
       await authClient.organization.create(
         {
           name: "My Organization",
-          slug: "my-org-" + Math.random().toString(36).substring(7),
+          slug: `my-org-${Math.random().toString(36).substring(7)}`,
         },
         {
           onSuccess: () => {

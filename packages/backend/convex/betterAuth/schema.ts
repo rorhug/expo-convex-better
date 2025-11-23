@@ -16,7 +16,7 @@ export const tables = {
     userId: v.optional(v.union(v.null(), v.string())),
     twoFactorEnabled: v.optional(v.union(v.null(), v.boolean())),
   })
-    .index("email_name", ["email","name"])
+    .index("email_name", ["email", "name"])
     .index("name", ["name"])
     .index("userId", ["userId"]),
   session: defineTable({
@@ -30,7 +30,7 @@ export const tables = {
     activeOrganizationId: v.optional(v.union(v.null(), v.string())),
   })
     .index("expiresAt", ["expiresAt"])
-    .index("expiresAt_userId", ["expiresAt","userId"])
+    .index("expiresAt_userId", ["expiresAt", "userId"])
     .index("token", ["token"])
     .index("userId", ["userId"]),
   account: defineTable({
@@ -48,8 +48,8 @@ export const tables = {
     updatedAt: v.number(),
   })
     .index("accountId", ["accountId"])
-    .index("accountId_providerId", ["accountId","providerId"])
-    .index("providerId_userId", ["providerId","userId"])
+    .index("accountId_providerId", ["accountId", "providerId"])
+    .index("providerId_userId", ["providerId", "userId"])
     .index("userId", ["userId"]),
   verification: defineTable({
     identifier: v.string(),
@@ -100,8 +100,7 @@ export const tables = {
     secret: v.string(),
     backupCodes: v.string(),
     userId: v.string(),
-  })
-    .index("userId", ["userId"]),
+  }).index("userId", ["userId"]),
 };
 
 const schema = defineSchema(tables);

@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
+import type * as lib_staff from "../lib/staff.js";
 import type * as organizations from "../organizations.js";
 import type * as privateData from "../privateData.js";
 import type * as todos from "../todos.js";
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   healthCheck: typeof healthCheck;
   http: typeof http;
+  "lib/staff": typeof lib_staff;
   organizations: typeof organizations;
   privateData: typeof privateData;
   todos: typeof todos;

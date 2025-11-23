@@ -44,12 +44,10 @@ export default function Team() {
             <Text className="font-medium text-foreground">
               {item.user.name}
             </Text>
-            <Text className="text-muted-foreground text-sm">
-              {item.user.email}
-            </Text>
+            <Text className="text-muted text-sm">{item.user.email}</Text>
           </View>
           <View className="rounded bg-muted px-2 py-1">
-            <Text className="text-foreground text-xs capitalize">
+            <Text className="text-foreground text-lg capitalize">
               {item.role}
             </Text>
           </View>

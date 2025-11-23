@@ -13,6 +13,7 @@ const nativeAppUrl = process.env.NATIVE_APP_URL || "mybettertapp://";
 const expoWebUrl = process.env.EXPO_WEB_URL || "http://localhost:8081";
 
 import authSchema from "./betterAuth/schema";
+import { staffEmails } from "./lib/staff";
 
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
@@ -47,7 +48,11 @@ function createAuth(
     plugins: [
       expo(),
       convex(),
-      organization(),
+      organization({
+        allowUserToCreateOrganization(user) {
+          return staffEmails.includes(user.email);
+        },
+      }),
       twoFactor(),
       crossDomain({ siteUrl: expoWebUrl }),
     ],

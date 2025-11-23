@@ -1,9 +1,9 @@
-import { View, Text } from "react-native";
+import { Redirect } from "expo-router";
+import { Text, View } from "react-native";
 import { Container } from "@/components/container";
 import { SignIn } from "@/components/sign-in";
 import { SignUp } from "@/components/sign-up";
 import { authClient } from "@/lib/auth-client";
-import { Redirect } from "expo-router";
 
 export default function LoginScreen() {
   const { data: session } = authClient.useSession();
@@ -15,7 +15,7 @@ export default function LoginScreen() {
   return (
     <Container className="p-6">
       <View className="flex-1 items-center justify-center gap-4">
-        <Text className="text-2xl font-bold text-foreground">Welcome</Text>
+        <Text className="font-bold text-2xl text-foreground">Welcome</Text>
         <SignIn />
         <View className="h-4" />
         <SignUp />
@@ -23,4 +23,3 @@ export default function LoginScreen() {
     </Container>
   );
 }
-
