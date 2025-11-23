@@ -52,6 +52,22 @@ function createAuth(
         allowUserToCreateOrganization(user) {
           return staffEmails.includes(user.email);
         },
+        sendInvitationEmail(data) {
+          // Log invitation metadata instead of sending email
+          console.log("Invitation Email Metadata:", {
+            email: data.email,
+            organizationId: data.organization.id,
+            organizationName: data.organization.name,
+            inviterId: data.inviter.user.id,
+            inviterName: data.inviter.user.name,
+            inviterEmail: data.inviter.user.email,
+            role: data.role,
+            invitationId: data.invitation.id,
+            expiresAt: data.invitation.expiresAt,
+          });
+          // Return void promise to satisfy type requirement
+          return Promise.resolve();
+        },
       }),
       twoFactor(),
       crossDomain({ siteUrl: expoWebUrl }),

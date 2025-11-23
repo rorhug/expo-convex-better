@@ -103,8 +103,6 @@ export const listMembers = query({
       }
     );
 
-    console.log("usersResult", usersResult, userIds);
-
     // Handle paginated result
     const users = Array.isArray(usersResult)
       ? usersResult
@@ -156,6 +154,75 @@ export const listMembers = query({
             : null,
         };
       }
+    );
+  },
+});
+
+export const listInvitations = query({
+  args: {
+    organizationId: v.string(),
+  },
+  returns: v.array(
+    v.object({
+      _id: v.string(),
+      organizationId: v.string(),
+      email: v.string(),
+      role: v.union(v.null(), v.string()),
+      status: v.string(),
+      expiresAt: v.number(),
+      inviterId: v.string(),
+      createdAt: v.number(),
+    })
+  ),
+  handler: async (ctx, args) => {
+    const invitationsResult = await ctx.runQuery(
+      components.betterAuth.adapter.findMany,
+      {
+        model: "invitation",
+        where: [
+          {
+            field: "organizationId",
+            value: args.organizationId,
+            operator: "eq",
+          },
+          {
+            field: "status",
+            value: "pending",
+            operator: "eq",
+          },
+        ],
+        paginationOpts: {
+          numItems: 1000,
+          cursor: null,
+        },
+      }
+    );
+
+    // Handle paginated result
+    const invitations = Array.isArray(invitationsResult)
+      ? invitationsResult
+      : (invitationsResult as { page?: unknown[] })?.page || [];
+
+    return invitations.map(
+      (inv: {
+        _id: string;
+        organizationId: string;
+        email: string;
+        role?: string | null;
+        status: string;
+        expiresAt: number;
+        inviterId: string;
+        createdAt?: number;
+      }) => ({
+        _id: inv._id,
+        organizationId: inv.organizationId,
+        email: inv.email,
+        role: inv.role || null,
+        status: inv.status,
+        expiresAt: inv.expiresAt,
+        inviterId: inv.inviterId,
+        createdAt: inv.createdAt || Date.now(),
+      })
     );
   },
 });
