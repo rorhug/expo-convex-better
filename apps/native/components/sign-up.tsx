@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { Button, TextField } from "heroui-native";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
@@ -6,14 +7,17 @@ import { authClient } from "@/lib/auth-client";
 type SignUpProps = {
   initialEmail?: string;
   emailDisabled?: boolean;
+  invitationId?: string;
   onSuccess?: () => void;
 };
 
 export function SignUp({
   initialEmail = "",
   emailDisabled = false,
+  invitationId,
   onSuccess,
 }: SignUpProps = {}) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
@@ -45,7 +49,11 @@ export function SignUp({
         onSuccess: () => {
           setName("");
           setPassword("");
-          onSuccess?.();
+          if (invitationId) {
+            router.replace(`/accept-invitation?invitationId=${invitationId}`);
+          } else {
+            onSuccess?.();
+          }
         },
         onFinished: () => {
           setIsLoading(false);

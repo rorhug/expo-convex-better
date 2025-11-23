@@ -78,6 +78,7 @@ export default function NoOrgScreen() {
               size="small"
             />
           ) : null}
+
           <Text className="font-semibold text-foreground">
             Create Organization
           </Text>
